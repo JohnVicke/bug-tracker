@@ -1,4 +1,6 @@
 import axios, { AxiosResponse } from "axios";
+import { Column } from "../components/Board/types";
+import { Board } from "../reducers/BoardReducer";
 import { User, UserLogin } from "../types/user";
 
 const baseURL = "http://localhost:42069/api/v1/";
@@ -35,7 +37,11 @@ export const getMe = () => {
 };
 
 export const createBoard = (boardOptions: CreateBoardOptions) => {
-  return axios.post("/board", boardOptions, defaults);
+  return axios.post<CreateBoardOptions, AxiosResponse<{ board: Board }>>(
+    "/board",
+    boardOptions,
+    defaults
+  );
 };
 
 export const getBoards = () => {
@@ -50,4 +56,16 @@ export const deleteBoardFromId = (id: number) => {
   return axios.put(`${baseURL}board/${id}`, defaults, {
     withCredentials: true,
   });
+};
+
+type AddBoardOptions = {
+  name: string;
+};
+
+export const addBoardColumn = (name: string, id: number) => {
+  return axios.post<AddBoardOptions, AxiosResponse<{ boardColumn: Column }>>(
+    `/board/column/${id}`,
+    { name },
+    defaults
+  );
 };

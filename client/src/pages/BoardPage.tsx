@@ -6,6 +6,7 @@ import { useBoard } from "../actions/BoardActions";
 import { AppContext } from "../contexts/AppContext";
 import { Button, IconButton, Tooltip } from "@chakra-ui/react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
+import { NewColumnSkeleton } from "../components/Board/NewColumnSkeleton";
 
 interface MatchParams {
   id: string;
@@ -34,7 +35,6 @@ export const BoardPage: React.FC<BoardPageProps> = ({
   useEffect(() => {
     getBoardFromIdAction(parseInt(id, 10));
   }, []);
-  console.log("[BOARDCOLUMNS]:", board.currentBoard);
 
   return (
     <Flex flexDir="row" height="100vh">
@@ -87,9 +87,10 @@ export const BoardPage: React.FC<BoardPageProps> = ({
       <Box overflow="auto">
         {board.currentBoard?.columns && (
           <>
-            <Box padding="2">
+            <Flex padding="2">
               <BoardColumns />
-            </Box>
+              <NewColumnSkeleton boardId={board.currentBoard.id} />
+            </Flex>
           </>
         )}
       </Box>

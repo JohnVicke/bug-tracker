@@ -84,6 +84,7 @@ export const getBoardFromId = async (req: Request, res: Response) => {
   const { id } = req.params;
   const replacements = [id];
 
+  // TODO: Somethings wonky here
   const columns = await getConnection().query(
     `
     select * from board_column as bc
@@ -93,6 +94,16 @@ export const getBoardFromId = async (req: Request, res: Response) => {
     `,
     replacements
   );
+
+  const test = await getConnection().query(
+    `
+    select * from board_column as bc
+    where bc."boardId"=$1
+    `,
+    replacements
+  );
+
+  console.log(test);
 
   // Dont ask me how this works
   const parsedColumns: any[] = [];
@@ -107,7 +118,11 @@ export const getBoardFromId = async (req: Request, res: Response) => {
         parsedColumns[foundIds[columnId]].cards = [{ content, id: cardId }];
       }
     } else {
-      parsedColumns[i] = { name, cards: [{ content, id: cardId }] };
+      parsedColumns[i] = {
+        name,
+        id: columnId,
+        cards: [{ content, id: cardId }],
+      };
       foundIds[columnId] = i;
     }
   }
@@ -120,4 +135,19 @@ export const deleteBoard = async (req: Request, res: Response) => {
   console.log("DELETE BOARD");
   const board = await Board.delete(id);
   res.json({ board });
+};
+
+export const insertColumn = async (req: Request, res: Response) => {
+  const { boardId } = req.params;
+  const { name } = req.body;
+  console.log(boardId, name);
+  if (!name || !boardId) return res.json({ error: "no name provided" });
+
+  const boardToken = v4();
+  const boardColumn = await BoardColumn.create({
+    boardId: parseInt(boardId, 10),
+    name,
+    columnId: boardToken,
+  }).save();
+  return res.json({ boardColumn });
 };

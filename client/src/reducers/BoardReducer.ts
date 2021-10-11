@@ -9,7 +9,9 @@ export enum Types {
   CurrentBoardFetched = "CURRENT_BOARD_FETCHED",
   StartFetchingBoards = "START_FETCHING_BOARDS",
   StartFetchingCurrentBoard = "START_FETCHING_CURRENT_BOARD",
-  UpdateBoards = "UPDATE_BOARDS",
+  DeleteBoard = "UPDATE_BOARDS",
+  AddBoard = "ADD_BOARD",
+  AddColumn = "ADD_COLUMN",
 }
 
 export type Board = {
@@ -39,8 +41,14 @@ type BoardPayload = {
   };
   [Types.StartFetchingBoards]: {};
   [Types.StartFetchingCurrentBoard]: {};
-  [Types.UpdateBoards]: {
+  [Types.DeleteBoard]: {
     id: number;
+  };
+  [Types.AddBoard]: {
+    board: Board;
+  };
+  [Types.AddColumn]: {
+    column: Column;
   };
 };
 
@@ -69,6 +77,10 @@ export const boardReducer = (
       if (!state.currentBoard) return { ...state };
       return {
         ...state,
+        currentBoard: {
+          ...state.currentBoard,
+          columns: action.payload.columns,
+        },
         //columns: action.payload.columns
         //? action.payload.columns
         //: state.currentBoard.columns,
@@ -86,7 +98,7 @@ export const boardReducer = (
         ...state,
         currentBoard: action.payload.board,
       };
-    case Types.UpdateBoards:
+    case Types.DeleteBoard:
       if (!action.payload.id) {
         return state;
       }
@@ -95,6 +107,29 @@ export const boardReducer = (
         boardsOveriew: state.boardsOveriew?.filter(
           (board) => board.id !== action.payload.id
         ),
+      };
+
+    case Types.AddBoard:
+      const { board } = action.payload;
+      if (!state.boardsOveriew) {
+        return state;
+      }
+      console.log([...state.boardsOveriew, board]);
+      return {
+        ...state,
+        boardsOveriew: [...state.boardsOveriew, { ...board }],
+      };
+    case Types.AddColumn:
+      const { column } = action.payload;
+      if (!state.currentBoard?.columns || !column) return state;
+      console.log(column);
+      console.log([...state.currentBoard.columns, column]);
+      return {
+        ...state,
+        currentBoard: {
+          ...state.currentBoard,
+          columns: [...state.currentBoard.columns, column],
+        },
       };
     default:
       return state;

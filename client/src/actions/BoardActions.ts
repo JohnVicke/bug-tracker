@@ -1,5 +1,11 @@
 import { useContext } from "react";
-import { deleteBoardFromId, getBoardFromId, getBoards } from "../adapters/api";
+import {
+  addBoardColumn,
+  createBoard,
+  deleteBoardFromId,
+  getBoardFromId,
+  getBoards,
+} from "../adapters/api";
 import { Card } from "../components/Board/types";
 import { AppContext } from "../contexts/AppContext";
 import { Types } from "../reducers/BoardReducer";
@@ -38,10 +44,19 @@ export const useBoard = () => {
 
   const deleteBoard = async (id: number) => {
     const { data } = await deleteBoardFromId(id);
-    console.log(id);
     dispatch({
-      type: Types.UpdateBoards,
+      type: Types.DeleteBoard,
       payload: { id },
+    });
+  };
+
+  const addBoard = async ({ name }: { name: string }) => {
+    const { data } = await createBoard({ name });
+    dispatch({
+      type: Types.AddBoard,
+      payload: {
+        board: data.board,
+      },
     });
   };
 
@@ -84,6 +99,7 @@ export const useBoard = () => {
     columnsCopy[sourceArrayIndex] = { ...sourceCopy, cards: srcCardArray };
     columnsCopy[destArrayIndex] = { ...destCopy, cards: destCardArray };
 
+    // TODO: Persist order through backend
     dispatch({
       type: Types.MoveCard,
       payload: { columns: columnsCopy },
@@ -93,17 +109,29 @@ export const useBoard = () => {
   const rearrangeCardAction = ({ listId, start, end }: RearrangeCardParams) => {
     if (!state?.board?.currentBoard?.columns) return;
     const currentArrIndex = state.board.currentBoard.columns.findIndex(
-      (column) => column.id === listId
+      (column) => `cardList-${column.id}` === listId
     );
+
     const columnCopy = Array.from(state.board.currentBoard.columns);
     const { cards, ...rest } = columnCopy[currentArrIndex];
     const [removed] = cards.splice(start, 1);
     cards.splice(end, 0, removed);
     columnCopy[currentArrIndex] = { ...rest, cards };
-
+    // TODO: Persist order through backend
     dispatch({
       type: Types.RearrangeCard,
       payload: { columns: columnCopy },
+    });
+  };
+
+  const addColumn = async (name: string, id: number) => {
+    if (!id) return console.error("no id");
+    const {
+      data: { boardColumn },
+    } = await addBoardColumn(name, id);
+    dispatch({
+      type: Types.AddColumn,
+      payload: { column: boardColumn, id },
     });
   };
 
@@ -113,5 +141,7 @@ export const useBoard = () => {
     rearrangeCardAction,
     getBoardFromIdAction,
     deleteBoard,
+    addBoard,
+    addColumn,
   };
 };

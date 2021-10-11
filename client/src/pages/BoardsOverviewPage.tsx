@@ -19,11 +19,12 @@ export const BoardsOverviewPage: React.FC<BoardsOverviewPageProps> = ({}) => {
 
   const history = useHistory();
 
-  const { getBoardsAction, deleteBoard } = useBoard();
+  const { getBoardsAction, deleteBoard, addBoard } = useBoard();
 
   const onSubmit = async (values: { name: string }, { setErrors }: any) => {
+    if (!values.name) return setErrors({ name: "Name is required" });
     try {
-      const res = await createBoard(values);
+      const res = await addBoard(values);
       console.log(res);
     } catch (err) {
       console.log(err);
@@ -37,12 +38,7 @@ export const BoardsOverviewPage: React.FC<BoardsOverviewPageProps> = ({}) => {
   }, []);
 
   return (
-    <Flex
-      width="100%"
-      justifyContent="center"
-      flexDir="column"
-      alignItems="center"
-    >
+    <Flex width="100%" justifyContent="center" flexDir="column">
       <Flex flexWrap="wrap">
         {board.boardsOveriew?.map((board) => (
           <Flex
@@ -55,23 +51,25 @@ export const BoardsOverviewPage: React.FC<BoardsOverviewPageProps> = ({}) => {
             justifyContent="space-between"
             key={board.id}
           >
-            <Text>{board.name}</Text>
-            <Tooltip label="Delete board">
-              <IconButton
-                onClick={() => deleteBoard(board.id)}
-                aria-label="Delete board"
-                icon={<DeleteIcon />}
-                size="s"
-              />
-            </Tooltip>
-            <Tooltip label="Go to board">
-              <IconButton
-                onClick={() => goTo(board.id)}
-                aria-label="Go to board"
-                icon={<ChevronRightIcon />}
-                size="s"
-              />
-            </Tooltip>
+            <Text>{board?.name}</Text>
+            <Flex width="50px" justifyContent="space-between">
+              <Tooltip label="Delete board">
+                <IconButton
+                  onClick={() => deleteBoard(board.id)}
+                  aria-label="Delete board"
+                  icon={<DeleteIcon />}
+                  size="s"
+                />
+              </Tooltip>
+              <Tooltip label="Go to board">
+                <IconButton
+                  onClick={() => goTo(board.id)}
+                  aria-label="Go to board"
+                  icon={<ChevronRightIcon />}
+                  size="s"
+                />
+              </Tooltip>
+            </Flex>
           </Flex>
         ))}
       </Flex>

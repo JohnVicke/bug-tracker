@@ -8,7 +8,7 @@ import {
 import { Input } from "@chakra-ui/input";
 
 type InputFieldProps = InputHTMLAttributes<HTMLInputElement> & {
-  label: string;
+  label?: string;
   name: string;
   textarea?: boolean;
 };
@@ -21,7 +21,7 @@ export const InputField: React.FC<InputFieldProps> = ({
   const [field, { error }] = useField(props);
   return (
     <FormControl isInvalid={!!error}>
-      <FormLabel htmlFor={field.name}>{label}</FormLabel>
+      {label && <FormLabel htmlFor={field.name}>{label}</FormLabel>}
       <Input {...field} {...props} id={field.name} />
       {error && <FormErrorMessage>{error}</FormErrorMessage>}
     </FormControl>

@@ -22,14 +22,13 @@ export const BoardColumns: React.FC<BoardColumnsProps> = () => {
     end: number
   ) => {
     // TODO: Move all this into action controllelr
-    if (!currentBoard) return;
+    if (!currentBoard?.columns) return;
     const { columns } = currentBoard;
-    if (!columns) return;
     const sourceArrayIndex = columns?.findIndex(
-      (column) => column.id === sourceListId
+      (column) => `cardList-${column.id}` === sourceListId
     );
     const destArrayIndex = columns?.findIndex(
-      (column) => column.id === destListId
+      (column) => `cardList-${column.id}` === destListId
     );
     const src = columns[sourceArrayIndex];
     const dest = columns[destArrayIndex];
@@ -39,7 +38,6 @@ export const BoardColumns: React.FC<BoardColumnsProps> = () => {
     const destCardArray = Array.from(dest.cards);
     const [removed] = srcCardArray.splice(start, 1);
     destCardArray.splice(end, 0, removed);
-    // update columns
     moveCardAction({
       sourceArrayIndex,
       destArrayIndex,

@@ -16,7 +16,6 @@ export const BoardRow: React.FC<BoardColumnProps> = ({ column, index }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  console.log(column);
   const { name } = column;
 
   const collapseColumn = () => {
@@ -102,24 +101,26 @@ export const BoardRow: React.FC<BoardColumnProps> = ({ column, index }) => {
           flexDir="column"
           marginTop="2"
         >
-          <Droppable droppableId={`cardList-${index}`}>
-            {(provided, snapshot) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                style={{
-                  minHeight: "100px",
-                  maxHeight: "80vh",
-                  overflowX: "hidden",
-                }}
-              >
-                {column.cards.map((card, index) => (
-                  <BoardCard card={card} index={index} key={card.id} />
-                ))}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
+          {column.cards && (
+            <Droppable droppableId={`cardList-${column.id}`}>
+              {(provided, snapshot) => (
+                <div
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  style={{
+                    minHeight: "100px",
+                    maxHeight: "80vh",
+                    overflowX: "hidden",
+                  }}
+                >
+                  {column.cards.map((card, index) => (
+                    <BoardCard card={card} index={index} key={card.id} />
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          )}
         </Flex>
       </Flex>
     </Box>
