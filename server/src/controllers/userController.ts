@@ -6,6 +6,8 @@ import argon2 from "argon2";
 export const register = async (req: Request, res: Response) => {
   const { username, password } = req.body;
   // run validation
+  if (!username || !password)
+    return res.json({ error: "No username or password" });
   const hashedPassowrd = await argon2.hash(password);
   let user;
   try {
